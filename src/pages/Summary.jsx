@@ -29,88 +29,42 @@ export default function Summary() {
         setError(null);
 
         try {
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            // Call our own secure backend
+            const response = await fetch('/api/generate-summary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: episode.title })
+            });
 
-            if (apiKey) {
-                // Real API Call Implementation using Gemini API
-                console.log('Using Gemini API key for summary generation...');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to generate summary');
+            }
 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: `You are an Islamic scholar assistant. Generate a detailed summary for the Seerah (biography of Prophet Muhammad ﷺ) episode titled "${episode.title}".
+            const data = await response.json();
 
-Please provide:
-1. A brief overview (2-3 sentences)
-2. Five key points from this episode
+            if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+                throw new Error('Invalid response structure from server');
+            }
 
-Format your response as a JSON object with this exact structure:
-{
-  "title": "${episode.title}",
-  "overview": "your overview here",
-  "keyPoints": ["point 1", "point 2", "point 3", "point 4", "point 5"]
-}`
-                            }]
-                        }]
-                    })
-                });
+            const generatedText = data.candidates[0].content.parts[0].text;
 
-                console.log('API Response status:', response.status);
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('API Error:', errorData);
-                    throw new Error(`API Error: ${errorData.error?.message || 'Unknown error'}`);
-                }
-
-                const data = await response.json();
-                console.log('API Response:', data);
-
-                if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-                    throw new Error('Invalid API response structure');
-                }
-
-                const generatedText = data.candidates[0].content.parts[0].text;
-                console.log('Generated text:', generatedText);
-
-                // Basic parsing of the JSON response from AI (assuming it returns valid JSON string)
-                // In a production app, we'd need more robust parsing/cleaning
-                try {
-                    const parsedSummary = JSON.parse(generatedText.replace(/```json|```/g, ''));
-                    setSummary(parsedSummary);
-                } catch (e) {
-                    // Fallback if JSON parsing fails
-                    setSummary({
-                        title: episode.title,
-                        overview: generatedText.slice(0, 200) + "...",
-                        keyPoints: ["Detailed summary content is available in the full text."]
-                    });
-                }
-
-            } else {
-                // Enhanced Simulation (Fallback)
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
+            try {
+                const parsedSummary = JSON.parse(generatedText.replace(/```json|```/g, ''));
+                setSummary(parsedSummary);
+            } catch (e) {
                 setSummary({
                     title: episode.title,
-                    overview: `In this episode, "${episode.title}", the speaker delves into significant events in the life of Prophet Muhammad ﷺ. The discussion provides historical context and spiritual insights relevant to the chapter of the Seerah being covered.`,
-                    keyPoints: [
-                        `Detailed analysis of the events surrounding ${episode.title}.`,
-                        "Examination of the socio-political climate of the time.",
-                        "Lessons on character, leadership, and faith derived from the narrative.",
-                        "Reflections on how these historical events apply to contemporary challenges.",
-                        "Closing supplications and reminders for the community."
-                    ]
+                    overview: generatedText.slice(0, 200) + "...",
+                    keyPoints: ["Detailed summary content is available in the full text."]
                 });
             }
+
         } catch (err) {
             console.error(err);
-            setError("Unable to generate summary at this time. Please try again later.");
+            setError(err.message || "Unable to generate summary. Please try again later.");
         } finally {
             setIsGenerating(false);
         }
