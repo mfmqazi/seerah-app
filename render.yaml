@@ -2,8 +2,8 @@ services:
   - type: web
     name: seerah-app
     env: docker
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: VITE_GEMINI_API_KEY
         sync: false
