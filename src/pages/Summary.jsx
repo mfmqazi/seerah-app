@@ -32,9 +32,10 @@ export default function Summary() {
             const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
             if (apiKey) {
-                // Real API Call Implementation
-                // This block will only execute if the user provides an API key in .env
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+                // Real API Call Implementation using Gemini API
+                console.log('Using Gemini API key for summary generation...');
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -42,18 +43,40 @@ export default function Summary() {
                     body: JSON.stringify({
                         contents: [{
                             parts: [{
-                                text: `Generate a detailed summary for the Seerah episode titled "${episode.title}". 
-                                Include an overview, 5 key points, and practical lessons. 
-                                Format the response as JSON with keys: title, overview, keyPoints (array).`
+                                text: `You are an Islamic scholar assistant. Generate a detailed summary for the Seerah (biography of Prophet Muhammad ﷺ) episode titled "${episode.title}".
+
+Please provide:
+1. A brief overview (2-3 sentences)
+2. Five key points from this episode
+
+Format your response as a JSON object with this exact structure:
+{
+  "title": "${episode.title}",
+  "overview": "your overview here",
+  "keyPoints": ["point 1", "point 2", "point 3", "point 4", "point 5"]
+}`
                             }]
                         }]
                     })
                 });
 
-                if (!response.ok) throw new Error('Failed to generate summary from AI service.');
+                console.log('API Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('API Error:', errorData);
+                    throw new Error(`API Error: ${errorData.error?.message || 'Unknown error'}`);
+                }
 
                 const data = await response.json();
+                console.log('API Response:', data);
+
+                if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+                    throw new Error('Invalid API response structure');
+                }
+
                 const generatedText = data.candidates[0].content.parts[0].text;
+                console.log('Generated text:', generatedText);
 
                 // Basic parsing of the JSON response from AI (assuming it returns valid JSON string)
                 // In a production app, we'd need more robust parsing/cleaning
