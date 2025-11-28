@@ -2,6 +2,7 @@ services:
   - type: web
     name: seerah-app
     env: docker
+    plan: free
     dockerfilePath: ./app.dockerfile
     envVars:
       - key: VITE_GEMINI_API_KEY
