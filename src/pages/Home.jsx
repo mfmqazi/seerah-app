@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Mic, ArrowRight } from 'lucide-react';
+import { BookOpen, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './Home.css';
+import yasirQadhiImg from '../assets/yasir-qadhi.png';
 
 export default function Home() {
     return (
@@ -45,8 +46,8 @@ export default function Home() {
                             transition={{ delay: 0.2 }}
                         >
                             <Link to="/yasir-qadhi" className="scholar-card glass-panel">
-                                <div className="scholar-icon">
-                                    <Mic size={40} />
+                                <div className="scholar-image-container">
+                                    <img src={yasirQadhiImg} alt="Dr. Yasir Qadhi" className="scholar-image" />
                                 </div>
                                 <h3>Dr. Yasir Qadhi</h3>
                                 <p className="scholar-description">
@@ -71,8 +72,8 @@ export default function Home() {
                             transition={{ delay: 0.4 }}
                         >
                             <Link to="/abdul-nasir-jangda" className="scholar-card glass-panel">
-                                <div className="scholar-icon">
-                                    <Mic size={40} />
+                                <div className="scholar-image-container">
+                                    <img src="https://www.qalamseminary.com/s/ANJ-headshot.jpg" alt="Shaykh Abdul Nasir Jangda" className="scholar-image" />
                                 </div>
                                 <h3>Shaykh Abdul Nasir Jangda</h3>
                                 <p className="scholar-description">
