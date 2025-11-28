@@ -2,8 +2,7 @@ services:
   - type: web
     name: seerah-app
     env: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    dockerfilePath: ./render.dockerfile
     envVars:
       - key: VITE_GEMINI_API_KEY
         sync: false
