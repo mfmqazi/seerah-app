@@ -1,7 +1,7 @@
 services:
   - type: web
     name: seerah-app
-    env: node
+    env: docker
     buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
