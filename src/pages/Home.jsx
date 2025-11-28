@@ -3,6 +3,7 @@ import { BookOpen, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './Home.css';
 import yasirQadhiImg from '../assets/yasir-qadhi.png';
+import abdulNasirJangdaImg from '../assets/abdul-nasir-jangda.png';
 
 export default function Home() {
     return (
@@ -73,7 +74,7 @@ export default function Home() {
                         >
                             <Link to="/abdul-nasir-jangda" className="scholar-card glass-panel">
                                 <div className="scholar-image-container">
-                                    <img src="https://www.qalamseminary.com/s/ANJ-headshot.jpg" alt="Shaykh Abdul Nasir Jangda" className="scholar-image" />
+                                    <img src={abdulNasirJangdaImg} alt="Shaykh Abdul Nasir Jangda" className="scholar-image" />
                                 </div>
                                 <h3>Shaykh Abdul Nasir Jangda</h3>
                                 <p className="scholar-description">
