@@ -38,9 +38,23 @@ export default function Summary() {
                 body: JSON.stringify({ title: episode.title })
             });
 
+            const contentType = response.headers.get("content-type");
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to generate summary');
+                if (contentType && contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to generate summary');
+                } else {
+                    const text = await response.text();
+                    console.error("Non-JSON Error Response:", text);
+                    throw new Error(`Server returned status ${response.status}. This might be a firewall or proxy issue.`);
+                }
+            }
+
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await response.text();
+                console.error("Unexpected Response:", text);
+                throw new Error("Received HTML instead of JSON. Your network might be blocking the API.");
             }
 
             const data = await response.json();
